@@ -1,0 +1,33 @@
+workflows:
+  ios-workflow:
+    name: iOS Build
+    environment:
+      xcode: latest
+      node: 18
+      cocoapods: default
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+          npx expo prebuild
+          cd ios && pod install
+      - name: Build iOS app
+        script: |
+          xcodebuild build \
+            -workspace ios/ZODManpower.xcworkspace \
+            -scheme ZODManpower \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath ZODManpower.xcarchive archive
+      - name: Export IPA
+        script: |
+          xcodebuild -exportArchive \
+            -archivePath ZODManpower.xcarchive \
+            -exportPath build \
+            -exportOptionsPlist exportOptions.plist
+    artifacts:
+      - build/*.ipa
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
