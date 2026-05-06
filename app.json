@@ -18,8 +18,7 @@
       "buildNumber": "1.0.0",
       "infoPlist": {
         "LSApplicationQueriesSchemes": ["https", "http", "wa"],
-        "NSPhotoLibraryUsageDescription": "This app needs access to photos to save candidate images",
-        "NSCameraUsageDescription": "This app needs camera access to take photos"
+        "NSPhotoLibraryUsageDescription": "This app needs access to photos to save candidate images"
       }
     },
     "android": {

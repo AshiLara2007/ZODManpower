@@ -4,43 +4,25 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.zodmanpower.app
-      vars:
-        BUNDLE_ID: "com.zodmanpower.app"
-        XCODE_WORKSPACE: "ZODManpower.xcworkspace"
-        XCODE_SCHEME: "ZODManpower"
       node: 18
       xcode: 16
-      cocoapods: default
     scripts:
       - name: Install npm dependencies
         script: |
           npm install
-      - name: Install CocoaPods
+      - name: Prebuild for simulator
         script: |
           npx expo prebuild --clean
+      - name: Install pods
+        script: |
           cd ios && pod install
-      - name: Set up code signing
+      - name: Build for simulator
         script: |
-          xcode-project use-profiles --warn-only
-      - name: Build IPA
-        script: |
-          xcode-project build-ipa \
-            --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          cd ios
+          xcodebuild -workspace ZODManpower.xcworkspace \
+            -scheme ZODManpower \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath build
     artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-    publishing:
-      email:
-        recipients:
-          - your-email@example.com
-        notify:
-          success: true
-          failure: true
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-        submit_to_app_store: false
+      - ios/build/Build/Products/Debug-iphonesimulator/*.app
