@@ -16,11 +16,19 @@ workflows:
       - name: Install pods
         script: |
           cd ios && pod install
+      - name: List all schemes (Debug)
+        script: |
+          cd ios
+          echo "=== Available schemes ==="
+          xcodebuild -workspace ZODManpower.xcworkspace -list
       - name: Build for simulator
         script: |
           cd ios
+          # Get the actual scheme name from workspace
+          SCHEME=$(xcodebuild -workspace ZODManpower.xcworkspace -list | grep -A 1 "Schemes:" | tail -n 1 | xargs)
+          echo "Using scheme: $SCHEME"
           xcodebuild -workspace ZODManpower.xcworkspace \
-            -scheme ZODManpower \
+            -scheme "$SCHEME" \
             -configuration Debug \
             -sdk iphonesimulator \
             -derivedDataPath build
