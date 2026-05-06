@@ -20,11 +20,22 @@ workflows:
           cd ios
           pod install --repo-update
       
+      - name: Get actual scheme name
+        script: |
+          cd ios
+          echo "=== Listing all schemes ==="
+          xcodebuild -workspace ZODManpower.xcworkspace -list
+          SCHEME=$(xcodebuild -workspace ZODManpower.xcworkspace -list | grep -A 1 "Schemes:" | tail -n 1 | tr -d ' ')
+          echo "Detected scheme: $SCHEME"
+          echo "$SCHEME" > scheme_name.txt
+      
       - name: Build Debug Simulator
         script: |
           cd ios
+          SCHEME=$(cat scheme_name.txt)
+          echo "Building with scheme: $SCHEME"
           xcodebuild -workspace ZODManpower.xcworkspace \
-            -scheme ZODManpower \
+            -scheme "$SCHEME" \
             -configuration Debug \
             -sdk iphonesimulator \
             -derivedDataPath build \
